@@ -1,4 +1,5 @@
 # value-determination
+Determine the value of companies using comparative analysis
 # Dependencies
 ```
 pip install pyspark
