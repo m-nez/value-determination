@@ -5,7 +5,7 @@ from scipy.spatial import KDTree
 from sklearn.preprocessing import minmax_scale
 from pyspark.sql import SparkSession
 from pyspark import SparkContext
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from analysis import analyse, reweight, summarise
 
 def task(quarter, k):

@@ -27,6 +27,7 @@ pip install dash-html-components==0.11.0
 pip install dash-core-components==0.23.0
 pip install plotly --upgrade
 
+
 # Usage
 
 $SPARK_HOME/bin/spark-submit --py-files analysis.py value_determination.py files/*.csv
