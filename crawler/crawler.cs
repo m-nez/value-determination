@@ -178,9 +178,7 @@ namespace MSSQL
 
         static void Main(string[] args)
         {
-            //  List<string> CompaniesLinks = GetCompaniesLinks("https://www.biznesradar.pl/gielda/indeks:WIG20");
-            List<string> CompaniesLinks = new List<string>();
-            CompaniesLinks.Add("OCTAVA");
+             List<string> CompaniesLinks = GetCompaniesLinks("https://www.biznesradar.pl/gielda/indeks:WIG20");
 
               if (!Directory.Exists("raporty"))
               {
