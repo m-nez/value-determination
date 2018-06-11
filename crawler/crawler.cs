@@ -15,8 +15,12 @@ namespace MSSQL
     {
         public int NbElement { get; }
         public string Name { get; }
-        public string Price { get; set; }
+
+        public double Price { get; set; }
+        public long NumberShares { get; set; }
+
         public string Shares { get; set; }
+
 
 
         private long []Values;
@@ -25,7 +29,8 @@ namespace MSSQL
             Name = name;
             NbElement = 17;
 
-            Values = new long[NbElement];  
+            Values = new long[NbElement];
+            Price = 0;
         }
 
         public void Set(int i, long v)
@@ -60,11 +65,11 @@ namespace MSSQL
             return CompaniesLinks;
         }
 
-        private static List<Raport> GetCompanyRaports(string url)
+        private static List<Raport> GetCompanyRaports(string name)
         {
             List<Raport> CompanyRaports = new List<Raport>();
 
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create("https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat/" + name + ",Q");
             WebResponse response = request.GetResponse();
             Stream stream = response.GetResponseStream();
 
@@ -79,10 +84,10 @@ namespace MSSQL
             HtmlNodeCollection rh = raport.SelectNodes("//th[@class='thq h'] | //th[@class='thq h newest']");
             foreach (HtmlNode element in rh)
             {
-                string name = element.InnerHtml;
-                name = Regex.Replace(name, @"\s", "");
+                string namen = element.InnerHtml;
+                namen = Regex.Replace(namen, @"\s", "");
 
-                CompanyRaports.Add(new Raport(name));
+                CompanyRaports.Add(new Raport(namen));
             }
 
             HtmlNodeCollection tr = raport.SelectNodes(".//tr ");
@@ -115,12 +120,67 @@ namespace MSSQL
                 i++;
             }
 
-            return CompanyRaports;
+            request = (HttpWebRequest)HttpWebRequest.Create("https://www.biznesradar.pl/wskazniki-wartosci-rynkowej/" + name + ",0");
+            response = request.GetResponse();
+            stream = response.GetResponseStream();
+
+            doc = new HtmlDocument();
+
+            doc.Load(stream);
+
+            //kurs akcji
+            r = doc.DocumentNode.SelectNodes("//table[@class='report-table']//tr");
+
+            List<double> prices =  new List<double>();
+
+            foreach (var p in r[1].SelectNodes(".//td"))
+            {
+                string price = p.InnerText.Trim();
+                if(price != "")
+                {
+                    try
+                    {
+                        double pp = Convert.ToDouble(price);
+                        prices.Add(pp);
+                    }
+                    catch (FormatException){ }
+                }
+            }
+
+            for (int j = 0; j < prices.Count; j++)
+                CompanyRaports[CompanyRaports.Count - j - 1].Price = prices[prices.Count - j - 1];
+
+            //ilość akcji
+            r = doc.DocumentNode.SelectNodes("//table[@class='report-table']//tr");
+
+            List<long> numbers = new List<long>();
+
+            foreach (var n in r[2].SelectNodes(".//td"))
+            {
+                string number = n.InnerText.Trim();
+                if (number != "")
+                {
+                    try
+                    {
+                        number = number.Replace(" ", "");
+                        long nn = Convert.ToInt64(number);
+                        numbers.Add(nn);
+                    }
+                    catch (FormatException) { }
+                }
+            }
+
+            for (int j = 0; j < numbers.Count; j++)
+                CompanyRaports[CompanyRaports.Count - j - 1].NumberShares = numbers[numbers.Count - j - 1];
+
+            return CompanyRaports.GetRange(5, CompanyRaports.Count-5);
         }
 
         static void Main(string[] args)
         {
-             List<string> CompaniesLinks = GetCompaniesLinks("https://www.biznesradar.pl/gielda/indeks:WIG20");
+            //  List<string> CompaniesLinks = GetCompaniesLinks("https://www.biznesradar.pl/gielda/indeks:WIG20");
+            List<string> CompaniesLinks = new List<string>();
+            CompaniesLinks.Add("OCTAVA");
 
               if (!Directory.Exists("raporty"))
               {
@@ -135,9 +195,9 @@ namespace MSSQL
                   System.Console.WriteLine(name + " (" + i + " / " + len + ")" );
 
                   StreamWriter sw = File.CreateText("raporty/" + name + ".csv");
+                  string header = "Kwartał,Przychody ze sprzedaży,Techniczny koszt wytworzenia produkcji sprzedanej,Koszty sprzedaży,Koszty ogólnego zarządu,Zysk ze sprzedaży,Pozostałe przychody operacyjne,Pozostałe koszty operacyjne,Zysk operacyjny (EBIT),Przychody finansowe,Koszty finansowe,Pozostałe przychody (koszty),Zysk z działalności gospodarczej,Wynik zdarzeń nadzwyczajnych,Zysk przed opodatkowaniem,Zysk (strata) netto z działalności zaniechanej,Zysk netto,Zysk netto akcjonariuszy jednostki dominującej,Kurs,Ilość akcji";
 
-                  string header = "Kwartał,Przychody ze sprzedaży,Techniczny koszt wytworzenia produkcji sprzedanej,Koszty sprzedaży,Koszty ogólnego zarządu,Zysk ze sprzedaży,Pozostałe przychody operacyjne,Pozostałe koszty operacyjne,Zysk operacyjny (EBIT),Przychody finansowe,Koszty finansowe,Pozostałe przychody (koszty),Zysk z działalności gospodarczej,Wynik zdarzeń nadzwyczajnych,Zysk przed opodatkowaniem,Zysk (strata) netto z działalności zaniechanej,Zysk netto,Zysk netto akcjonariuszy jednostki dominującej";
-                  List<Raport> CompanyRaports = GetCompanyRaports("https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat/"+name+",Q");
+                  List<Raport> CompanyRaports = GetCompanyRaports(name);
                   
                   if(CompanyRaports == null)
                   {
@@ -155,6 +215,8 @@ namespace MSSQL
                        for (int j = 0; j < element.NbElement; j++)
                             sw.Write("," + element.Get(j));
 
+                       sw.Write("," + element.Price);
+                       sw.Write("," + element.NumberShares);
                        sw.WriteLine();
                   }
 
