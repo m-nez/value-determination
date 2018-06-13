@@ -11,7 +11,7 @@ nuget install HtmlAgilityPack
 Make sure that the paths to HtmlAgilityPack.dll is correct.
 Compile:
 ```
-msc crawler.cs -r:System.Net.Http -reference:HtmlAgilityPack.1.8.4/lib/Net40/HtmlAgilityPack.dll
+mcs crawler.cs -r:System.Net.Http -reference:HtmlAgilityPack.1.8.4/lib/Net40/HtmlAgilityPack.dll
 ```
 Run:
 ```
