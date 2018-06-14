@@ -10,9 +10,11 @@ from visualization.style_colors import getStyle
 
 app = dash.Dash()
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
-stock = [70.20, 71.10, 70.20, 69.70, 71.60, 72.70, 73.00, 71.60, 73.10]
-predictions = [72.70, 73.00, 71.60, 73.10, 70.20, 71.10, 70.20, 69.70, 71.60]
-
+stockList = [[70.20, 71.10, 70.20, 69.70, 71.60, 72.70, 73.00, 71.60, 73.10],
+             [70.20, 71.10, 70.20, 59.70, 71.60, 72.70, 73.00, 71.60, 73.10]]
+predictionList =[[72.70, 73.00, 71.60, 73.10, 70.20, 71.10, 70.20, 69.70, 71.60],
+              [72.70, 73.00, 71.60, 58.10, 70.20, 71.10, 70.20, 69.70, 71.60]]
+nameList = ['name1', 'name2']
 
 def tableInit():
     x = np.empty(9)
@@ -22,7 +24,7 @@ def tableInit():
     return x
 
 
-def calculateInvestments(stockQuotes, predictions):
+def calculateInvestments(stockQuotes, predictions, name):
     invest, value, profit = 0, 0, 0
     hasBought = False
     for x in range(0, len(predictions)):
@@ -41,12 +43,11 @@ def calculateInvestments(stockQuotes, predictions):
     PRE = [invest]
     bhlFactor = ((stockQuotes[-1] / stockQuotes[0]) - 1) * 100
     preFactor = (((value + profit) / invest) - 1) * 100
-    for i in range (0,6):
-        BHL.append(str("%.2f" % round(bhlFactor, 3)))
-        PRE.append(str("%.2f" % round(preFactor, 3)))
+    BHL.append(str("%.2f" % round(bhlFactor, 3)))
+    PRE.append(str("%.2f" % round(preFactor, 3)))
     dict = {}
-    dict['name'] = BHL
-    dict['name_prediction'] = PRE
+    dict[name] = BHL
+    dict[name +'_prediction'] = PRE
     return dict
 
 
@@ -61,30 +62,33 @@ def generate_table(dataframe, max_rows=10):
         ]) for i in range(min(len(dataframe), max_rows))]
     )
 
+def makeLayout(x, stockList, predictionList, nameList):
+    list = [
+        html.H1(children='New quality of Business'),
+
+        html.Div(children='''
+            Some clever words to begin with
+        ''')]
+    for i in range(0, len(stockList)):
+        list.append(html.Div(children=generate_table(pd.DataFrame(data=calculateInvestments(stockList[i], predictionList[i], nameList[i]))),
+                     style={'width': '20%', 'float': 'left'}))
+        list.append(dcc.Graph(
+                id='graph' + nameList[i],
+                figure={
+                    'data': [
+                        {'x': x, 'y': stockList[i], 'type': 'scatter', 'name': 'Stock'},
+                        {'x': x, 'y': predictionList[i], 'type': 'scatter', 'name': 'Predictions'},
+                    ],
+                    'layout': {
+                        'title': 'Quotes Visualization'
+                    }
+                }, style={'width': '78%', 'float': 'left', 'display': 'inline-block'}
+            ))
+    return list
 
 x = tableInit()
-app.layout = html.Div(children=[
-    html.H1(children='New quality of Business'),
 
-    html.Div(children='''
-        Some clever words to begin with
-    '''),
-    html.Div(children=generate_table(pd.DataFrame(data=calculateInvestments(stock, predictions))),
-             style={'width': '15%', 'float': 'left'}),
-    dcc.Graph(
-        id='example-graph',
-        figure={
-            'data': [
-                {'x': x, 'y': stock, 'type': 'scatter', 'name': 'Stock'},
-                {'x': x, 'y': predictions, 'type': 'scatter', 'name': 'Predictions'},
-            ],
-            'layout': {
-                'title': 'Quotes Visualization'
-            }
-        }, style={'width': '84%', 'float': 'left', 'display': 'inline-block'}
-    )
-
-])
+app.layout = html.Div(children= makeLayout(x, stockList, predictionList, nameList))
 
 # def addFirmVisualization(stockQuotes, predictions, investmentRates):
 
