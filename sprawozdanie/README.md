@@ -1,0 +1,4 @@
+Compile:
+```
+pdflatex sprawozdanie.tex
+```
