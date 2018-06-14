@@ -1,0 +1,50 @@
+\documentclass{article}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{indentfirst}
+%\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\DeclareGraphicsRule{*}{mps}{*}{}
+\begin{document}
+\title{Wyznaczanie wartości firm metodą porównawczą}
+\author{Michał Nieznański, Stanisław Pawlak, Adrian Szewczyk}
+\maketitle
+
+\section{Wstęp}
+Celem projektu miało być stworzenie progamu wyznaczającego wartość firm, w celu podejmowania
+lepszych decyzji biznesowych.
+\section{Program główny}
+Program dokonuje analizy wsadowej jako zadanie Apache Spark.
+W celu uruchomienia programu na konkretnym klastrze należy podać go jako argument programu.
+Uruchomienie wygląda następująco:
+\begin{verbatim}
+$SPARK_HOME/bin/spark-submit --py-files analysis.py \
+value_determination.py files/*.csv --master spark://hostname:port
+\end{verbatim}
+\$SPARK\_HOME to katalog, w którym znajduje się Spark.
+Oprócz głównego skryptu należy załączyć wszystkie moduły, z których ten skrypt korzysta używając
+opcji
+\begin{verbatim}
+--py-files
+\end{verbatim}
+programu spark-submit, w tym przypadku analysis.py.
+Argumentem pozycyjnym programu value\_determination jest lista plików CSV zawierających dane z raportów
+kwartalnych firm.
+\subsection{Działanie}
+Program wczytuje pliki do DataFrame, a następnie zrównolegla wykonanie analizy pomiędzy kwartały
+poprzez sc.parallelize, a następnie map na otrzymanym RDD.
+sc to SparkContext inicializowany na początku programu.
+Wynik mapowania zwraca wyliczone ceny akcji firm w kwartałach.
+\section{Wizualizacja}
+Wyliczone ceny akcji są wizualizowne, a skuteczość analizy programu weryfikowana poprzez
+przeprowadzenie symulacji giełdowej.
+\section{Wnioski}
+\begin{itemize}
+	\item Wykorzystanie klastra Apache Spark do zadania o
+		małych rozmiarach skutkuje narzutami czasowymi związanymi z komunikacją,
+		o wiele rzędów wielkości przekraczającymi czas wykonania jako skrypt na jednej maszynie
+	\item Apache Spark pozwala na łatwą skalowalność infrastruktury wykonującej zadania
+\end{itemize}
+\end{document}
