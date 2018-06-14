@@ -1,0 +1,1 @@
+Proszê modyfikowaæ plik content/sprawozdanieChapter1, ew. grafiki umieszczaæ w figures/
