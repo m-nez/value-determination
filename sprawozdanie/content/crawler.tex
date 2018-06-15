@@ -2,12 +2,12 @@
 
 Podstawowym zadaniem w big data jest uzyskiwaania danych do analizy, które najczęściej są otrzymywane przez crawler. Jest to program zbierający informacje o strukturze, stronach i treściach znajdujących się w internecie. Efekty pracy robota mogą być różne, w zależności od jego przeznaczenia, na przykład może on skanować wybrane witryny w celu zbudowania danych.
 
-\section{Crawling w naszym projekcie}
+\subsection{Crawling w naszym projekcie}
 
 W naszym przypadku robot chodził po stronie https://www.biznesradar.pl/ i pobierał z niej interesujące nas dane.
 Wszystkie dane są zapisywane do pliku {INDEX}.csv w folderze raporty. Dane te otrzymujemy dla każdego kwartału, pomijając pięć pierwszych kwartałów od początku działalności.
 
-\subsection{https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat/ \{INDEX\},Q}
+\subsubsection{https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat/ \{INDEX\},Q}
 Z tej podstrony uzyskujemy następujące dane:
 \begin{enumerate}
   \item Kwartał
@@ -30,14 +30,14 @@ Z tej podstrony uzyskujemy następujące dane:
   \item Zysk netto akcjonariuszy jednostki dominującej
 \end{enumerate}
 
-\subsection{https://www.biznesradar.pl/wskazniki-wartosci-rynkowej/\{INDEX\},0}
+\subsubsection{https://www.biznesradar.pl/wskazniki-wartosci-rynkowej/\{INDEX\},0}
 \begin{enumerate}
 \item Kurs
 \item Ilość akcji
 \end{enumerate}
 
-\section{Etap filtracji danych}
+\subsection{Etap filtracji danych}
 Etap filtracji danych polegał na odrzuceniu pięciu pierwszych raportów kwartarnych dla każdej spółki.
 
-\section{Wykorzystana technologia}
+\subsection{Wykorzystana technologia}
 Crawler został napisany w języku C\# przy wykorzystaniu biblioteki HtmlAgilityPack.
