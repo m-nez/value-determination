@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
         # Exact valuation
         results[itr][0]['Median_P2E'] = series[itr].iloc[0,0]
-        results[itr][0]['Kurs'] = results[itr][0]['Median_P2E'] * results[itr][0]['Zysk netto']
+        results[itr][0]['Kurs'] = results[itr][0]['Median_P2E'] * results[itr][0]['Zysk netto'] / results[itr][0]['Ilość akcji']
 
     summarise(results)
 
