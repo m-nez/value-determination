@@ -1,6 +1,7 @@
 import pandas
 import numpy
 import argparse
+import json
 from scipy.spatial import KDTree
 from sklearn.preprocessing import minmax_scale
 from pyspark.sql import SparkSession
@@ -41,6 +42,7 @@ if __name__ == "__main__":
     parser.add_argument("files", nargs="+", help="csv files with company data")
     parser.add_argument("-m", "--master", default="local")
     parser.add_argument("-k", default=5, help="k nearest companies to take for analysis")
+    parser.add_argument("-o", "--output")
 
     args = parser.parse_args()
 
@@ -68,14 +70,31 @@ if __name__ == "__main__":
     results = quartersRDD.map(lambda x : task(x, int(args.k))).collect()
 
     # Exponential smoothing
-    series = list()
-    for itr in range(len(results[0])):
-        series.append(esmooth_df(results, 'Median_P2E', minrows, itr, 0.9))
+    #series = list()
+    #for itr in range(len(results[0])):
+        #series.append(esmooth_df(results, 'Median_P2E', minrows, itr, 0.9))
 
         # Exact valuation
-        results[itr][0]['Median_P2E'] = series[itr].iloc[0,0]
-        results[itr][0]['Kurs'] = results[itr][0]['Median_P2E'] * results[itr][0]['Zysk netto'] / results[itr][0]['Ilość akcji']
+        #results[itr][0]['Median_P2E'] = series[itr].iloc[0,0]
+        #results[itr][0]['Kurs'] = results[itr][0]['Median_P2E'] * results[itr][0]['Zysk netto'] / results[itr][0]['Ilość akcji']
+    
+    pquote = []
+    tquote = []
+    names = keys
 
-    summarise(results)
+    for i, k in enumerate(results):
+        pquote.append([])
+        tquote.append([])
+        for f, name in zip(k, keys):
+            pquote[i].append(
+                f['Median_P2E'][0] * f['Zysk netto'][0] / f['Ilość akcji'][0]
+            )
+
+
+            tquote[i].append(f['Kurs'][0])
+
+
+    with open(args.output, "w") as f:
+        json.dump([names, tquote, pquote], f)
 
     spark.stop()
