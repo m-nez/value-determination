@@ -8,6 +8,7 @@ import dash_html_components as html
 import json
 from visualization.style_colors import getStyle
 import argparse
+import webbrowser
 
 parser = argparse.ArgumentParser()
 
@@ -95,8 +96,8 @@ with open (args.filename, "r") as f:
     x = tableInit()
 
     app.layout = html.Div(children= makeLayout(x, stockList, predictionList, nameList))
-
-# def addFirmVisualization(stockQuotes, predictions, investmentRates):
+    webbrowser.open('http://localhost:8050', new=1)
+    # def addFirmVisualization(stockQuotes, predictions, investmentRates):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
