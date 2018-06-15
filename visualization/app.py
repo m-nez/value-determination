@@ -10,9 +10,11 @@ from visualization.style_colors import getStyle
 import argparse
 
 parser = argparse.ArgumentParser()
-args = parser.parse_args()
+
 parser.add_argument('filename', type=str,
                    help='analyse filename')
+args = parser.parse_args()
+
 app = dash.Dash()
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
@@ -24,8 +26,8 @@ with open (args.filename, "r") as f:
     nameList = list[0]
 
     def tableInit():
-        x = np.empty(9)
-        b = np.arange(0, 9, 1)
+        x = np.empty(len(stockList[0]))
+        b = np.arange(0, len(stockList[0]), 1)
         ind = np.arange(len(x))
         np.put(x, ind, b)
         return x
@@ -71,11 +73,8 @@ with open (args.filename, "r") as f:
 
     def makeLayout(x, stockList, predictionList, nameList):
         list = [
-            html.H1(children='New quality of Business'),
+            html.H1(children='Determining the value of companies by the comparative method')]
 
-            html.Div(children='''
-                Some clever words to begin with
-            ''')]
         for i in range(0, len(stockList)):
             list.append(html.Div(children=generate_table(pd.DataFrame(data=calculateInvestments(stockList[i], predictionList[i], nameList[i]))),
                          style={'width': '20%', 'float': 'left'}))
