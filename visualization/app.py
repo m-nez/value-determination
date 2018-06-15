@@ -6,7 +6,8 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import json
-from visualization.style_colors import getStyle
+#from visualization.style_colors import getStyle
+from style_colors import getStyle
 import argparse
 import webbrowser
 
@@ -25,6 +26,11 @@ with open (args.filename, "r") as f:
     stockList = list[1]
     predictionList =list[2]
     nameList = list[0]
+    stockList = [e for e in reversed(stockList)]
+    predictionList = [e for e in reversed(predictionList)]
+    stockList = np.array(stockList).T.tolist()
+    predictionList = np.array(predictionList).T.tolist()
+    #predictionList = np.array(predictionList).T.tolist()
 
     def tableInit():
         x = np.empty(len(stockList[0]))
@@ -35,24 +41,33 @@ with open (args.filename, "r") as f:
 
 
     def calculateInvestments(stockQuotes, predictions, name):
-        invest, value, profit = 0, 0, 0
-        hasBought = False
-        for x in range(0, len(predictions)):
-            if predictions[x] > stockQuotes[x]:
-                if hasBought == False:
-                    invest += stockQuotes[x]
-                    hasBought = True
-                else:
-                    value = stockQuotes[x]
-            else:
-                if hasBought == True:
-                    profit += stockQuotes[x]
-                    value = 0
-                    hasBought = False
-        BHL = [stockQuotes[0]]
-        PRE = [invest]
+        #invest, value, profit = 0, 0, 0
+        #hasBought = True
+        #invest = stockQuotes[0]
+        #for x in range(1, len(predictions)):
+        #    if predictions[x] > stockQuotes[x]:
+        #        if hasBought == False:
+        #            invest += stockQuotes[x]
+        #            hasBought = True
+        #        else:
+        #            value = stockQuotes[x]
+        #    else:
+        #        if hasBought == True:
+        #            profit += stockQuotes[x]
+        #            value = 0
+        #            hasBought = False
+        BHL = ["BH"]
+        PRE = ["NPSK"]
+
+        p = 1
+        print(name)
+        for i in range(0, len(stockQuotes) - 1):
+            print(stockQuotes[i])
+            if predictions[i] > stockQuotes[i]:
+                p *= stockQuotes[i + 1] / stockQuotes[i]
+
         bhlFactor = ((stockQuotes[-1] / stockQuotes[0]) - 1) * 100
-        preFactor = (((value + profit) / invest) - 1) * 100
+        preFactor = (p - 1) * 100
         BHL.append(str("%.2f" % round(bhlFactor, 3)))
         PRE.append(str("%.2f" % round(preFactor, 3)))
         dict = {}
@@ -68,7 +83,7 @@ with open (args.filename, "r") as f:
 
             # Body
             [html.Tr([
-                html.Td(dataframe.iloc[i][col], style = getStyle(dataframe.iloc[i][col])) for col in dataframe.columns
+                html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
             ]) for i in range(min(len(dataframe), max_rows))]
         )
 
