@@ -23,6 +23,12 @@ Program wczytuje pliki do DataFrame, a następnie zrównolegla wykonanie analizy
 poprzez sc.parallelize, a następnie map na otrzymanym RDD.
 sc to SparkContext inicializowany na początku programu.
 Wynik mapowania zwraca wyliczone ceny akcji firm w kwartałach.
+\subsection{Analiza}
+W trakcie analizy ze wszystkich dostępnych firm wybierane jest K najbardziej podobnych
+firm ze zbioru danych.
+W celu obliczenia podobieństwa wskaźniki firm są normalizowane.
+Uzyskane w ten sposób wektory liczb z zakresu od 0 do 1 są porównywane pod względem
+odległości euklidesowej do firmy docelowej, której kurs ma być obliczony.
 \section{Wizualizacja}
 Wyliczone ceny akcji są wizualizowne, a skuteczość analizy programu weryfikowana poprzez
 przeprowadzenie symulacji giełdowej.
