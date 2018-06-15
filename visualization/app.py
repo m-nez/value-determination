@@ -7,11 +7,16 @@ import dash_core_components as dcc
 import dash_html_components as html
 import json
 from visualization.style_colors import getStyle
+import argparse
 
+parser = argparse.ArgumentParser()
+args = parser.parse_args()
+parser.add_argument('filename', type=str,
+                   help='analyse filename')
 app = dash.Dash()
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
-with open as f(plik.json, "r"):
+with open (args.filename, "r") as f:
     list = json.load(f);
 
     stockList = list[1]
