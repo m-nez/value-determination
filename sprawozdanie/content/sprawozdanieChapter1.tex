@@ -72,6 +72,17 @@ firm ze zbioru danych.
 W celu obliczenia podobieństwa wskaźniki firm są normalizowane.
 Uzyskane w ten sposób wektory liczb z zakresu od 0 do 1 są porównywane pod względem
 odległości euklidesowej do firmy docelowej, której kurs ma być obliczony.
+\section{Algorytm Wyceny}
+W tworzonym programie zastosowaliśmy algorytm z rodziny algorytmów mnożnikowych wyceny przedsiębiorstwa - metodę porównawczą
+
+Kroki algorytmu:
+\begin{itemize}
+	\item Obliczenie wskaźnika P/E - Price to Equiuty, który jest ilorazem ceny przedsiębiorstwa (kapitalizacji rynkowej przedsiębiorstwa - mnożenie liczby akcji razy kurs akcji) oraz zysku netto przedsiębiorstwa które osiągneło w danym kwartale
+	\item Obliczenie mediany wskaźników P/E - tak aby jak najlepiej odzwierciedlić rynkową wartość wskaźnika
+	\item Mnożenie wskaźnika razy wartość zysku netto danego przedsiębiorstwa
+	\item Dzielenie otrzymanej wartości przez liczbę akcji
+\end{itemize}
+W ten sposób dla każdego kartału otrzymujemy estymowaną cenę akcji dla danego przedsiębiorstwa
 \section{Wizualizacja}
 Wyliczone ceny akcji są wizualizowne, a skuteczość analizy programu weryfikowana poprzez
 przeprowadzenie symulacji giełdowej.
